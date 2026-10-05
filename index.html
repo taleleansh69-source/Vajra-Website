@@ -15,21 +15,31 @@
 
 <header class="topbar">
 
+  <!-- VAJRA 2 LOGO -->
   <a class="brand" href="#home">
-    <span class="brand-mark">V<sup>2</sup></span>
 
-    <span>
+    <img
+      src="logo.png"
+      alt="VAJRA 2 Logo"
+      class="brand-logo"
+    >
+
+    <span class="brand-text">
       <b>VAJRA 2</b>
       <small>DUAL JOYSTICK CONTROL</small>
     </span>
+
   </a>
 
+
+  <!-- CONNECTION STATUS -->
   <div class="connection">
 
     <span id="statusDot" class="dot"></span>
 
     <div>
       <b id="connectionStatus">Disconnected</b>
+
       <small id="connectionHint">
         Connect your Main ESP32-C3 in Settings
       </small>
@@ -37,19 +47,32 @@
 
   </div>
 
-  <nav>
-    <a href="#home">Home</a>
-    <a href="#controls">Controls</a>
 
-    <button id="openSettings" class="nav-button">
+  <!-- NAVIGATION -->
+  <nav>
+
+    <a href="#home">
+      Home
+    </a>
+
+    <a href="#controls">
+      Controls
+    </a>
+
+    <button
+      id="openSettings"
+      class="nav-button"
+    >
       ⚙ Settings
     </button>
+
   </nav>
 
 </header>
 
 
 <main id="home" class="page">
+
 
   <!-- HERO -->
 
@@ -71,13 +94,23 @@
 
     </div>
 
+
     <div class="hero-chip">
 
-      <span class="chip-icon">⌁</span>
+      <span class="chip-icon">
+        ⌁
+      </span>
 
       <span>
-        <b>MAIN BOARD</b>
-        <small>ESP32-C3 • BLE</small>
+
+        <b>
+          MAIN BOARD
+        </b>
+
+        <small>
+          ESP32-C3 • BLE
+        </small>
+
       </span>
 
     </div>
@@ -85,14 +118,19 @@
   </section>
 
 
-  <!-- JOYSTICKS + TELEMETRY -->
+  <!-- CONTROL AREA -->
 
-  <section id="controls" class="control-grid">
+  <section
+    id="controls"
+    class="control-grid"
+  >
 
 
     <!-- LEFT JOYSTICK -->
 
-    <article class="panel joystick-panel cyan-panel">
+    <article
+      class="panel joystick-panel cyan-panel"
+    >
 
       <div class="panel-heading">
 
@@ -141,10 +179,17 @@
         <div class="stick-ring">
 
           <div class="crosshair horizontal"></div>
+
           <div class="crosshair vertical"></div>
 
-          <div id="leftStick" class="stick">
+
+          <div
+            id="leftStick"
+            class="stick"
+          >
+
             <span></span>
+
           </div>
 
         </div>
@@ -155,13 +200,28 @@
       <div class="readouts">
 
         <div>
-          <small>THROTTLE</small>
-          <b id="throttleValue">0%</b>
+
+          <small>
+            THROTTLE
+          </small>
+
+          <b id="throttleValue">
+            0%
+          </b>
+
         </div>
 
+
         <div>
-          <small>YAW</small>
-          <b id="yawValue">0</b>
+
+          <small>
+            YAW
+          </small>
+
+          <b id="yawValue">
+            0
+          </b>
+
         </div>
 
       </div>
@@ -169,10 +229,11 @@
     </article>
 
 
-
     <!-- TELEMETRY -->
 
-    <article class="panel telemetry-panel">
+    <article
+      class="panel telemetry-panel"
+    >
 
       <div class="panel-heading">
 
@@ -188,7 +249,10 @@
 
         </div>
 
-        <span id="dataMode" class="mode-pill">
+        <span
+          id="dataMode"
+          class="mode-pill"
+        >
           WAITING
         </span>
 
@@ -198,28 +262,72 @@
       <div class="telemetry-grid">
 
         <div class="metric">
-          <small>ROLL</small>
-          <b id="rollData">—</b>
-          <em>degrees</em>
+
+          <small>
+            ROLL
+          </small>
+
+          <b id="rollData">
+            —
+          </b>
+
+          <em>
+            degrees
+          </em>
+
         </div>
 
-        <div class="metric">
-          <small>PITCH</small>
-          <b id="pitchData">—</b>
-          <em>degrees</em>
-        </div>
 
         <div class="metric">
-          <small>YAW</small>
-          <b id="yawData">—</b>
-          <em>command</em>
+
+          <small>
+            PITCH
+          </small>
+
+          <b id="pitchData">
+            —
+          </b>
+
+          <em>
+            degrees
+          </em>
+
         </div>
 
+
         <div class="metric">
-          <small>BATTERY</small>
-          <b id="batteryData">—</b>
-          <em>volts</em>
+
+          <small>
+            YAW
+          </small>
+
+          <b id="yawData">
+            —
+          </b>
+
+          <em>
+            command
+          </em>
+
         </div>
+
+
+        <div class="metric">
+
+          <small>
+            BATTERY
+          </small>
+
+          <b id="batteryData">
+            —
+          </b>
+
+          <em>
+            volts
+          </em>
+
+        </div>
+
 
         <div class="metric wide">
 
@@ -238,12 +346,14 @@
 
       <div class="safety-note">
 
-        <b>⚠ BENCH TEST ONLY</b>
+        <b>
+          ⚠ BENCH TEST ONLY
+        </b>
 
         <p>
           Remove all propellers for setup and testing.
-          This page does not provide flight stabilization
-          or an emergency hardware failsafe.
+          This dashboard does not replace a hardware
+          failsafe or flight controller.
         </p>
 
       </div>
@@ -251,10 +361,11 @@
     </article>
 
 
-
     <!-- RIGHT JOYSTICK -->
 
-    <article class="panel joystick-panel purple-panel">
+    <article
+      class="panel joystick-panel purple-panel"
+    >
 
       <div class="panel-heading">
 
@@ -303,10 +414,17 @@
         <div class="stick-ring">
 
           <div class="crosshair horizontal"></div>
+
           <div class="crosshair vertical"></div>
 
-          <div id="rightStick" class="stick">
+
+          <div
+            id="rightStick"
+            class="stick"
+          >
+
             <span></span>
+
           </div>
 
         </div>
@@ -317,13 +435,28 @@
       <div class="readouts">
 
         <div>
-          <small>ROLL</small>
-          <b id="rollValue">0</b>
+
+          <small>
+            ROLL
+          </small>
+
+          <b id="rollValue">
+            0
+          </b>
+
         </div>
 
+
         <div>
-          <small>PITCH</small>
-          <b id="pitchValue">0</b>
+
+          <small>
+            PITCH
+          </small>
+
+          <b id="pitchValue">
+            0
+          </b>
+
         </div>
 
       </div>
@@ -331,7 +464,6 @@
     </article>
 
   </section>
-
 
 
   <!-- BOTTOM CONTROLS -->
@@ -349,28 +481,44 @@
         COMMAND CENTER
       </h2>
 
+
       <div class="actions">
 
-        <button id="connectQuick" class="btn connect-btn">
-          Connect
+        <button
+          id="connectQuick"
+          class="btn connect-btn"
+        >
+          CONNECT
         </button>
 
-        <button id="stopButton" class="btn stop-btn" disabled>
+
+        <button
+          id="stopButton"
+          class="btn stop-btn"
+          disabled
+        >
           STOP
         </button>
 
-        <button id="centerButton" class="btn secondary-btn">
-          Center Joysticks
+
+        <button
+          id="centerButton"
+          class="btn secondary-btn"
+        >
+          CENTER JOYSTICKS
         </button>
 
       </div>
 
-      <p id="commandStatus" class="muted small-text">
+
+      <p
+        id="commandStatus"
+        class="muted small-text"
+      >
         Commands are disabled until BLE is connected.
       </p>
 
     </article>
-
 
 
     <article class="panel settings-summary">
@@ -383,31 +531,59 @@
         CONNECTION
       </h2>
 
-      <div class="setting-line">
-        <span>Device</span>
-        <b id="deviceName">Not connected</b>
-      </div>
 
       <div class="setting-line">
-        <span>Protocol</span>
-        <b>BLE GATT</b>
+
+        <span>
+          Device
+        </span>
+
+        <b id="deviceName">
+          Not connected
+        </b>
+
       </div>
 
+
       <div class="setting-line">
-        <span>Dashboard mode</span>
+
+        <span>
+          Protocol
+        </span>
+
+        <b>
+          BLE GATT
+        </b>
+
+      </div>
+
+
+      <div class="setting-line">
+
+        <span>
+          Dashboard mode
+        </span>
+
         <b id="dashboardMode">
           Demo / disconnected
         </b>
+
       </div>
 
-      <button id="settingsConnect" class="btn secondary-btn full-btn">
-        Open Connection Settings
+
+      <button
+        id="settingsConnect"
+        class="btn secondary-btn full-btn"
+      >
+        OPEN CONNECTION SETTINGS
       </button>
 
     </article>
 
   </section>
 
+
+  <!-- FOOTER -->
 
   <footer>
 
@@ -432,10 +608,10 @@
   class="modal hidden"
   role="dialog"
   aria-modal="true"
-  aria-labelledby="settingsTitle"
 >
 
   <div class="modal-card">
+
 
     <button
       id="closeSettings"
@@ -450,15 +626,16 @@
       SYSTEM SETTINGS
     </p>
 
-    <h2 id="settingsTitle">
+
+    <h2>
       Connect Main Board
     </h2>
 
+
     <p class="muted">
 
-      Choose the BLE device advertised by your
-      Main ESP32-C3. The board must run matching
-      BLE firmware.
+      Connect your Main ESP32-C3 through Bluetooth.
+      The BLE UUIDs must match your ESP32 firmware.
 
     </p>
 
@@ -466,7 +643,7 @@
     <div class="setting-box">
 
       <span>
-        Expected BLE name
+        Expected BLE Name
       </span>
 
       <b>
@@ -521,15 +698,16 @@
         id="modalConnect"
         class="btn connect-btn"
       >
-        Connect Main ESP32-C3
+        CONNECT MAIN ESP32-C3
       </button>
+
 
       <button
         id="disconnectButton"
         class="btn secondary-btn"
         disabled
       >
-        Disconnect
+        DISCONNECT
       </button>
 
     </div>
@@ -540,7 +718,6 @@
       class="small-text muted"
     >
       Use Chrome or Edge on HTTPS or localhost.
-      Bluetooth may not work from a file opened directly.
     </p>
 
   </div>
