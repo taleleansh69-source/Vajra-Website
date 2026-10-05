@@ -1,54 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#061326">
 
-  <title>VAJRA 2 | Dual Joystick Control</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+  <meta
+    name="theme-color"
+    content="#061326"
+  >
+
+  <title>
+    VAJRA 2 | Dual Joystick Control
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <script
+    src="script.js"
+    defer
+  ></script>
+
 </head>
+
 
 <body>
 
+
+<!-- =====================================================
+     TOP NAVIGATION
+===================================================== -->
+
 <header class="topbar">
 
-  <!-- VAJRA 2 LOGO -->
-  <a class="brand" href="#home">
 
-    <img
-      src="logo.png"
-      alt="VAJRA 2 Logo"
-      class="brand-logo"
-    >
+  <!-- BRAND / LOGO -->
+
+  <a
+    class="brand"
+    href="#home"
+  >
+
+    <div class="logo-container">
+
+      <!-- YOUR UPLOADED LOGO -->
+
+      <img
+        src="logo.png"
+        alt="VAJRA 2 Logo"
+        class="brand-logo"
+        onerror="
+          this.style.display='none';
+          this.nextElementSibling.style.display='flex';
+        "
+      >
+
+
+      <!-- FALLBACK LOGO -->
+
+      <div
+        class="logo-fallback"
+        aria-hidden="true"
+      >
+
+        V<sup>2</sup>
+
+      </div>
+
+    </div>
+
 
     <span class="brand-text">
-      <b>VAJRA 2</b>
-      <small>DUAL JOYSTICK CONTROL</small>
+
+      <b>
+        VAJRA 2
+      </b>
+
+      <small>
+        DUAL JOYSTICK CONTROL
+      </small>
+
     </span>
 
   </a>
 
 
   <!-- CONNECTION STATUS -->
+
   <div class="connection">
 
-    <span id="statusDot" class="dot"></span>
+    <span
+      id="statusDot"
+      class="dot"
+    ></span>
+
 
     <div>
-      <b id="connectionStatus">Disconnected</b>
+
+      <b id="connectionStatus">
+        Disconnected
+      </b>
 
       <small id="connectionHint">
         Connect your Main ESP32-C3 in Settings
       </small>
+
     </div>
 
   </div>
 
 
   <!-- NAVIGATION -->
+
   <nav>
 
     <a href="#home">
@@ -62,6 +133,7 @@
     <button
       id="openSettings"
       class="nav-button"
+      type="button"
     >
       ⚙ Settings
     </button>
@@ -71,12 +143,23 @@
 </header>
 
 
-<main id="home" class="page">
+
+<!-- =====================================================
+     MAIN PAGE
+===================================================== -->
+
+<main
+  id="home"
+  class="page"
+>
 
 
-  <!-- HERO -->
+  <!-- ===================================================
+       HERO
+  ==================================================== -->
 
   <section class="hero">
+
 
     <div>
 
@@ -84,9 +167,11 @@
         FLIGHT SYSTEMS / VAJRA PROJECT
       </p>
 
+
       <h1>
         TAKE CONTROL<span>.</span>
       </h1>
+
 
       <p class="subhead">
         Two virtual joysticks. One drone. Your control dashboard.
@@ -100,6 +185,7 @@
       <span class="chip-icon">
         ⌁
       </span>
+
 
       <span>
 
@@ -118,7 +204,10 @@
   </section>
 
 
-  <!-- CONTROL AREA -->
+
+  <!-- ===================================================
+       JOYSTICK + TELEMETRY
+  ==================================================== -->
 
   <section
     id="controls"
@@ -126,7 +215,9 @@
   >
 
 
-    <!-- LEFT JOYSTICK -->
+    <!-- =================================================
+         LEFT JOYSTICK
+    ================================================== -->
 
     <article
       class="panel joystick-panel cyan-panel"
@@ -134,21 +225,25 @@
 
       <div class="panel-heading">
 
+
         <div>
 
           <p class="eyebrow">
             LEFT JOYSTICK
           </p>
 
+
           <h2>
             MOVE
           </h2>
+
 
           <p class="muted">
             Throttle / Yaw
           </p>
 
         </div>
+
 
         <span class="axis-tag cyan">
           ● THROTTLE + YAW
@@ -159,17 +254,21 @@
 
       <div class="stick-wrap">
 
+
         <div class="axis-label top">
           THROTTLE UP
         </div>
+
 
         <div class="axis-label bottom">
           THROTTLE DOWN
         </div>
 
+
         <div class="axis-label left">
           YAW LEFT
         </div>
+
 
         <div class="axis-label right">
           YAW RIGHT
@@ -178,9 +277,15 @@
 
         <div class="stick-ring">
 
-          <div class="crosshair horizontal"></div>
 
-          <div class="crosshair vertical"></div>
+          <div
+            class="crosshair horizontal"
+          ></div>
+
+
+          <div
+            class="crosshair vertical"
+          ></div>
 
 
           <div
@@ -192,12 +297,14 @@
 
           </div>
 
+
         </div>
 
       </div>
 
 
       <div class="readouts">
+
 
         <div>
 
@@ -229,13 +336,18 @@
     </article>
 
 
-    <!-- TELEMETRY -->
+
+    <!-- =================================================
+         TELEMETRY
+    ================================================== -->
 
     <article
       class="panel telemetry-panel"
     >
 
+
       <div class="panel-heading">
+
 
         <div>
 
@@ -243,11 +355,13 @@
             LIVE TELEMETRY
           </p>
 
+
           <h2>
             FLIGHT DATA
           </h2>
 
         </div>
+
 
         <span
           id="dataMode"
@@ -259,7 +373,9 @@
       </div>
 
 
+
       <div class="telemetry-grid">
+
 
         <div class="metric">
 
@@ -344,6 +460,7 @@
       </div>
 
 
+
       <div class="safety-note">
 
         <b>
@@ -361,13 +478,18 @@
     </article>
 
 
-    <!-- RIGHT JOYSTICK -->
+
+    <!-- =================================================
+         RIGHT JOYSTICK
+    ================================================== -->
 
     <article
       class="panel joystick-panel purple-panel"
     >
 
+
       <div class="panel-heading">
+
 
         <div>
 
@@ -375,15 +497,18 @@
             RIGHT JOYSTICK
           </p>
 
+
           <h2>
             ROTATE
           </h2>
+
 
           <p class="muted">
             Roll / Pitch
           </p>
 
         </div>
+
 
         <span class="axis-tag purple">
           ● ROLL + PITCH
@@ -392,19 +517,24 @@
       </div>
 
 
+
       <div class="stick-wrap">
+
 
         <div class="axis-label top">
           PITCH FORWARD
         </div>
 
+
         <div class="axis-label bottom">
           PITCH BACK
         </div>
 
+
         <div class="axis-label left">
           ROLL LEFT
         </div>
+
 
         <div class="axis-label right">
           ROLL RIGHT
@@ -413,9 +543,15 @@
 
         <div class="stick-ring">
 
-          <div class="crosshair horizontal"></div>
 
-          <div class="crosshair vertical"></div>
+          <div
+            class="crosshair horizontal"
+          ></div>
+
+
+          <div
+            class="crosshair vertical"
+          ></div>
 
 
           <div
@@ -427,12 +563,15 @@
 
           </div>
 
+
         </div>
 
       </div>
 
 
+
       <div class="readouts">
+
 
         <div>
 
@@ -466,16 +605,23 @@
   </section>
 
 
-  <!-- BOTTOM CONTROLS -->
+
+  <!-- ===================================================
+       COMMAND CENTER
+  ==================================================== -->
 
   <section class="bottom-grid">
 
 
+    <!-- COMMANDS -->
+
     <article class="panel action-panel">
+
 
       <p class="eyebrow">
         DRONE CONTROLS
       </p>
+
 
       <h2>
         COMMAND CENTER
@@ -484,9 +630,11 @@
 
       <div class="actions">
 
+
         <button
           id="connectQuick"
           class="btn connect-btn"
+          type="button"
         >
           CONNECT
         </button>
@@ -495,6 +643,7 @@
         <button
           id="stopButton"
           class="btn stop-btn"
+          type="button"
           disabled
         >
           STOP
@@ -504,9 +653,11 @@
         <button
           id="centerButton"
           class="btn secondary-btn"
+          type="button"
         >
           CENTER JOYSTICKS
         </button>
+
 
       </div>
 
@@ -521,11 +672,16 @@
     </article>
 
 
+
+    <!-- CONNECTION SETTINGS -->
+
     <article class="panel settings-summary">
+
 
       <p class="eyebrow">
         DEVICE SETTINGS
       </p>
+
 
       <h2>
         CONNECTION
@@ -565,7 +721,7 @@
         </span>
 
         <b id="dashboardMode">
-          Demo / disconnected
+          Disconnected
         </b>
 
       </div>
@@ -574,6 +730,7 @@
       <button
         id="settingsConnect"
         class="btn secondary-btn full-btn"
+        type="button"
       >
         OPEN CONNECTION SETTINGS
       </button>
@@ -583,7 +740,10 @@
   </section>
 
 
-  <!-- FOOTER -->
+
+  <!-- ===================================================
+       FOOTER
+  ==================================================== -->
 
   <footer>
 
@@ -601,7 +761,9 @@
 
 
 
-<!-- SETTINGS MODAL -->
+<!-- =====================================================
+     SETTINGS MODAL
+===================================================== -->
 
 <div
   id="settingsModal"
@@ -610,12 +772,14 @@
   aria-modal="true"
 >
 
+
   <div class="modal-card">
 
 
     <button
       id="closeSettings"
       class="close-button"
+      type="button"
       aria-label="Close settings"
     >
       ×
@@ -640,6 +804,7 @@
     </p>
 
 
+
     <div class="setting-box">
 
       <span>
@@ -651,6 +816,7 @@
       </b>
 
     </div>
+
 
 
     <div class="setting-box">
@@ -666,6 +832,7 @@
     </div>
 
 
+
     <div class="setting-box">
 
       <span>
@@ -677,6 +844,7 @@
       </code>
 
     </div>
+
 
 
     <div class="setting-box">
@@ -692,11 +860,14 @@
     </div>
 
 
+
     <div class="modal-actions">
+
 
       <button
         id="modalConnect"
         class="btn connect-btn"
+        type="button"
       >
         CONNECT MAIN ESP32-C3
       </button>
@@ -705,10 +876,12 @@
       <button
         id="disconnectButton"
         class="btn secondary-btn"
+        type="button"
         disabled
       >
         DISCONNECT
       </button>
+
 
     </div>
 
@@ -723,6 +896,7 @@
   </div>
 
 </div>
+
 
 </body>
 </html>
