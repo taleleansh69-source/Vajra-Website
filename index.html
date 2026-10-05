@@ -15,9 +15,7 @@
     content="#061326"
   >
 
-  <title>
-    VAJRA 2 | Dual Joystick Control
-  </title>
+  <title>VAJRA 2 | Drone Control</title>
 
   <link
     rel="stylesheet"
@@ -36,13 +34,15 @@
 
 
 <!-- =====================================================
-     TOP NAVIGATION
+     TOP BAR
 ===================================================== -->
 
 <header class="topbar">
 
 
-  <!-- BRAND / LOGO -->
+  <!-- ===================================================
+       VAJRA 2 BRAND
+  ==================================================== -->
 
   <a
     class="brand"
@@ -51,28 +51,20 @@
 
     <div class="logo-container">
 
-      <!-- YOUR UPLOADED LOGO -->
-
+      <!-- REAL LOGO -->
       <img
-        src="logo.png"
-        alt="VAJRA 2 Logo"
+        id="vajraLogo"
+        src="./logo.png"
+        alt=""
         class="brand-logo"
-        onerror="
-          this.style.display='none';
-          this.nextElementSibling.style.display='flex';
-        "
       >
 
-
-      <!-- FALLBACK LOGO -->
-
+      <!-- AUTOMATIC FALLBACK -->
       <div
+        id="logoFallback"
         class="logo-fallback"
-        aria-hidden="true"
       >
-
         V<sup>2</sup>
-
       </div>
 
     </div>
@@ -80,9 +72,7 @@
 
     <span class="brand-text">
 
-      <b>
-        VAJRA 2
-      </b>
+      <b>VAJRA 2</b>
 
       <small>
         DUAL JOYSTICK CONTROL
@@ -93,7 +83,9 @@
   </a>
 
 
-  <!-- CONNECTION STATUS -->
+  <!-- ===================================================
+       CONNECTION STATUS
+  ==================================================== -->
 
   <div class="connection">
 
@@ -102,7 +94,6 @@
       class="dot"
     ></span>
 
-
     <div>
 
       <b id="connectionStatus">
@@ -110,7 +101,7 @@
       </b>
 
       <small id="connectionHint">
-        Connect your Main ESP32-C3 in Settings
+        Connect Main ESP32-C3
       </small>
 
     </div>
@@ -118,7 +109,9 @@
   </div>
 
 
-  <!-- NAVIGATION -->
+  <!-- ===================================================
+       NAVIGATION
+  ==================================================== -->
 
   <nav>
 
@@ -145,7 +138,7 @@
 
 
 <!-- =====================================================
-     MAIN PAGE
+     MAIN
 ===================================================== -->
 
 <main
@@ -160,21 +153,18 @@
 
   <section class="hero">
 
-
     <div>
 
       <p class="eyebrow">
-        FLIGHT SYSTEMS / VAJRA PROJECT
+        VAJRA PROJECT / FLIGHT CONTROL SYSTEM
       </p>
-
 
       <h1>
         TAKE CONTROL<span>.</span>
       </h1>
 
-
       <p class="subhead">
-        Two virtual joysticks. One drone. Your control dashboard.
+        Dual joystick control for your VAJRA 2 drone.
       </p>
 
     </div>
@@ -183,18 +173,17 @@
     <div class="hero-chip">
 
       <span class="chip-icon">
-        ⌁
+        ✦
       </span>
-
 
       <span>
 
         <b>
-          MAIN BOARD
+          MAIN ESP32-C3
         </b>
 
         <small>
-          ESP32-C3 • BLE
+          BLE CONTROL LINK
         </small>
 
       </span>
@@ -206,7 +195,7 @@
 
 
   <!-- ===================================================
-       JOYSTICK + TELEMETRY
+       MAIN CONTROL AREA
   ==================================================== -->
 
   <section
@@ -225,18 +214,15 @@
 
       <div class="panel-heading">
 
-
         <div>
 
           <p class="eyebrow">
             LEFT JOYSTICK
           </p>
 
-
           <h2>
             MOVE
           </h2>
-
 
           <p class="muted">
             Throttle / Yaw
@@ -244,9 +230,8 @@
 
         </div>
 
-
         <span class="axis-tag cyan">
-          ● THROTTLE + YAW
+          THROTTLE + YAW
         </span>
 
       </div>
@@ -254,39 +239,31 @@
 
       <div class="stick-wrap">
 
-
         <div class="axis-label top">
           THROTTLE UP
         </div>
-
 
         <div class="axis-label bottom">
           THROTTLE DOWN
         </div>
 
-
         <div class="axis-label left">
           YAW LEFT
         </div>
-
 
         <div class="axis-label right">
           YAW RIGHT
         </div>
 
 
-        <div class="stick-ring">
+        <div
+          id="leftRing"
+          class="stick-ring"
+        >
 
+          <div class="crosshair horizontal"></div>
 
-          <div
-            class="crosshair horizontal"
-          ></div>
-
-
-          <div
-            class="crosshair vertical"
-          ></div>
-
+          <div class="crosshair vertical"></div>
 
           <div
             id="leftStick"
@@ -297,14 +274,12 @@
 
           </div>
 
-
         </div>
 
       </div>
 
 
       <div class="readouts">
-
 
         <div>
 
@@ -345,9 +320,7 @@
       class="panel telemetry-panel"
     >
 
-
       <div class="panel-heading">
-
 
         <div>
 
@@ -355,13 +328,11 @@
             LIVE TELEMETRY
           </p>
 
-
           <h2>
             FLIGHT DATA
           </h2>
 
         </div>
-
 
         <span
           id="dataMode"
@@ -371,7 +342,6 @@
         </span>
 
       </div>
-
 
 
       <div class="telemetry-grid">
@@ -460,17 +430,15 @@
       </div>
 
 
-
       <div class="safety-note">
 
         <b>
-          ⚠ BENCH TEST ONLY
+          ⚠ SAFETY
         </b>
 
         <p>
-          Remove all propellers for setup and testing.
-          This dashboard does not replace a hardware
-          failsafe or flight controller.
+          Remove all propellers while testing the
+          joystick and BLE connection.
         </p>
 
       </div>
@@ -487,9 +455,7 @@
       class="panel joystick-panel purple-panel"
     >
 
-
       <div class="panel-heading">
-
 
         <div>
 
@@ -497,11 +463,9 @@
             RIGHT JOYSTICK
           </p>
 
-
           <h2>
             ROTATE
           </h2>
-
 
           <p class="muted">
             Roll / Pitch
@@ -509,50 +473,40 @@
 
         </div>
 
-
         <span class="axis-tag purple">
-          ● ROLL + PITCH
+          ROLL + PITCH
         </span>
 
       </div>
 
 
-
       <div class="stick-wrap">
-
 
         <div class="axis-label top">
           PITCH FORWARD
         </div>
 
-
         <div class="axis-label bottom">
           PITCH BACK
         </div>
 
-
         <div class="axis-label left">
           ROLL LEFT
         </div>
-
 
         <div class="axis-label right">
           ROLL RIGHT
         </div>
 
 
-        <div class="stick-ring">
+        <div
+          id="rightRing"
+          class="stick-ring"
+        >
 
+          <div class="crosshair horizontal"></div>
 
-          <div
-            class="crosshair horizontal"
-          ></div>
-
-
-          <div
-            class="crosshair vertical"
-          ></div>
-
+          <div class="crosshair vertical"></div>
 
           <div
             id="rightStick"
@@ -563,15 +517,12 @@
 
           </div>
 
-
         </div>
 
       </div>
 
 
-
       <div class="readouts">
-
 
         <div>
 
@@ -613,15 +564,11 @@
   <section class="bottom-grid">
 
 
-    <!-- COMMANDS -->
-
     <article class="panel action-panel">
 
-
       <p class="eyebrow">
-        DRONE CONTROLS
+        DRONE CONTROL
       </p>
-
 
       <h2>
         COMMAND CENTER
@@ -629,7 +576,6 @@
 
 
       <div class="actions">
-
 
         <button
           id="connectQuick"
@@ -658,7 +604,6 @@
           CENTER JOYSTICKS
         </button>
 
-
       </div>
 
 
@@ -666,25 +611,21 @@
         id="commandStatus"
         class="muted small-text"
       >
-        Commands are disabled until BLE is connected.
+        Commands disabled until BLE is connected.
       </p>
 
     </article>
 
 
 
-    <!-- CONNECTION SETTINGS -->
-
     <article class="panel settings-summary">
 
-
       <p class="eyebrow">
-        DEVICE SETTINGS
+        CONNECTION
       </p>
 
-
       <h2>
-        CONNECTION
+        MAIN BOARD
       </h2>
 
 
@@ -704,11 +645,11 @@
       <div class="setting-line">
 
         <span>
-          Protocol
+          Board
         </span>
 
         <b>
-          BLE GATT
+          ESP32-C3
         </b>
 
       </div>
@@ -717,11 +658,11 @@
       <div class="setting-line">
 
         <span>
-          Dashboard mode
+          Protocol
         </span>
 
-        <b id="dashboardMode">
-          Disconnected
+        <b>
+          BLE
         </b>
 
       </div>
@@ -732,7 +673,7 @@
         class="btn secondary-btn full-btn"
         type="button"
       >
-        OPEN CONNECTION SETTINGS
+        CONNECTION SETTINGS
       </button>
 
     </article>
@@ -748,11 +689,11 @@
   <footer>
 
     <span>
-      VAJRA 2 • DIY QUADCOPTER DASHBOARD
+      VAJRA 2 • DUAL JOYSTICK
     </span>
 
     <span>
-      REAL DATA ONLY WHEN CONNECTED
+      REAL ESP32 DATA WHEN CONNECTED
     </span>
 
   </footer>
@@ -768,8 +709,6 @@
 <div
   id="settingsModal"
   class="modal hidden"
-  role="dialog"
-  aria-modal="true"
 >
 
 
@@ -780,35 +719,30 @@
       id="closeSettings"
       class="close-button"
       type="button"
-      aria-label="Close settings"
     >
       ×
     </button>
 
 
     <p class="eyebrow">
-      SYSTEM SETTINGS
+      VAJRA 2 SETTINGS
     </p>
 
 
     <h2>
-      Connect Main Board
+      Connect Main ESP32-C3
     </h2>
 
 
     <p class="muted">
-
-      Connect your Main ESP32-C3 through Bluetooth.
-      The BLE UUIDs must match your ESP32 firmware.
-
+      Use Chrome or Edge with Web Bluetooth enabled.
     </p>
-
 
 
     <div class="setting-box">
 
       <span>
-        Expected BLE Name
+        BLE DEVICE NAME
       </span>
 
       <b>
@@ -818,11 +752,10 @@
     </div>
 
 
-
     <div class="setting-box">
 
       <span>
-        Service UUID
+        SERVICE UUID
       </span>
 
       <code>
@@ -832,11 +765,10 @@
     </div>
 
 
-
     <div class="setting-box">
 
       <span>
-        Command UUID
+        COMMAND UUID
       </span>
 
       <code>
@@ -846,11 +778,10 @@
     </div>
 
 
-
     <div class="setting-box">
 
       <span>
-        Telemetry UUID
+        TELEMETRY UUID
       </span>
 
       <code>
@@ -860,16 +791,14 @@
     </div>
 
 
-
     <div class="modal-actions">
-
 
       <button
         id="modalConnect"
         class="btn connect-btn"
         type="button"
       >
-        CONNECT MAIN ESP32-C3
+        CONNECT ESP32-C3
       </button>
 
 
@@ -882,7 +811,6 @@
         DISCONNECT
       </button>
 
-
     </div>
 
 
@@ -890,7 +818,7 @@
       id="settingsMessage"
       class="small-text muted"
     >
-      Use Chrome or Edge on HTTPS or localhost.
+      Waiting for connection.
     </p>
 
   </div>
