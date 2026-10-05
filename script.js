@@ -1,15 +1,7 @@
 // ======================================================
-// VAJRA 2
-// DUAL JOYSTICK + BLE MAIN ESP32-C3 CONTROL
+// VAJRA 2 - DUAL JOYSTICK CONTROLLER
+// FIXED VERSION
 // ======================================================
-
-
-// ======================================================
-// BLE SETTINGS
-// ======================================================
-
-// These MUST match the BLE firmware running on
-// your Main ESP32-C3.
 
 const BLE_NAME = "VAJRA2-FLIGHT";
 
@@ -24,60 +16,10 @@ const TELEMETRY_UUID =
 
 
 // ======================================================
-// SHORT DOM FUNCTION
+// HELPER
 // ======================================================
 
 const $ = (id) => document.getElementById(id);
-
-
-// ======================================================
-// UI ELEMENTS
-// ======================================================
-
-const ui = {
-
-  statusDot:
-    $("statusDot"),
-
-  connectionStatus:
-    $("connectionStatus"),
-
-  connectionHint:
-    $("connectionHint"),
-
-  dataMode:
-    $("dataMode"),
-
-  deviceName:
-    $("deviceName"),
-
-  dashboardMode:
-    $("dashboardMode"),
-
-  commandStatus:
-    $("commandStatus"),
-
-  settingsMessage:
-    $("settingsMessage"),
-
-  connectQuick:
-    $("connectQuick"),
-
-  settingsConnect:
-    $("settingsConnect"),
-
-  modalConnect:
-    $("modalConnect"),
-
-  disconnectButton:
-    $("disconnectButton"),
-
-  stopButton:
-    $("stopButton"),
-
-  settingsModal:
-    $("settingsModal")
-};
 
 
 // ======================================================
@@ -85,166 +27,112 @@ const ui = {
 // ======================================================
 
 let bleDevice = null;
-
-let server = null;
-
+let bleServer = null;
 let commandCharacteristic = null;
-
 let telemetryCharacteristic = null;
 
-
-// ======================================================
-// COMMAND VARIABLES
-// ======================================================
-
-let lastSent = "";
-
 let sendTimer = null;
-
-let writeQueue = Promise.resolve();
+let lastCommand = "";
 
 
 // ======================================================
 // JOYSTICK VALUES
 // ======================================================
 
-// throttle = 0 to 100
-// yaw      = -100 to +100
-// roll     = -100 to +100
-// pitch    = -100 to +100
-
 const axes = {
-
   throttle: 0,
-
   yaw: 0,
-
   roll: 0,
-
   pitch: 0
-
 };
 
 
-const activePointers = new Map();
-
-
 // ======================================================
-// CONNECTION STATUS
+// CONNECTION UI
 // ======================================================
 
-function setConnection(
-  connected,
-  message = ""
-) {
+function setConnection(connected, message = "") {
 
-  ui.statusDot.classList.toggle(
+  $("statusDot").classList.toggle(
     "connected",
     connected
   );
 
+  $("connectionStatus").textContent =
+    connected ? "Connected" : "Disconnected";
 
-  ui.connectionStatus.textContent =
-    connected
-      ? "Connected"
-      : "Disconnected";
-
-
-  ui.connectionHint.textContent =
+  $("connectionHint").textContent =
     connected
       ? "Main ESP32-C3 BLE link active"
       : "Connect your Main ESP32-C3 in Settings";
 
+  $("dataMode").textContent =
+    connected ? "BLE LINK" : "WAITING";
 
-  ui.dataMode.textContent =
-    connected
-      ? "BLE LINK"
-      : "WAITING";
-
-
-  ui.dataMode.classList.toggle(
+  $("dataMode").classList.toggle(
     "live",
     connected
   );
 
-
-  ui.deviceName.textContent =
+  $("deviceName").textContent =
     connected && bleDevice
-      ? (
-          bleDevice.name ||
-          BLE_NAME
-        )
+      ? (bleDevice.name || BLE_NAME)
       : "Not connected";
 
-
-  ui.dashboardMode.textContent =
+  $("dashboardMode").textContent =
     connected
-      ? "Connected / awaiting data"
+      ? "Connected"
       : "Disconnected";
 
-
-  ui.connectQuick.disabled =
+  $("connectQuick").disabled =
     connected;
 
-
-  ui.settingsConnect.disabled =
+  $("settingsConnect").disabled =
     connected;
 
-
-  ui.modalConnect.disabled =
+  $("modalConnect").disabled =
     connected;
 
-
-  ui.disconnectButton.disabled =
+  $("disconnectButton").disabled =
     !connected;
 
-
-  ui.stopButton.disabled =
+  $("stopButton").disabled =
     !connected;
 
-
-  ui.commandStatus.textContent =
+  $("commandStatus").textContent =
     message ||
     (
       connected
-        ? "BLE connected. Joystick commands can be sent; flight firmware must safely handle them."
+        ? "BLE connected."
         : "Commands are disabled until BLE is connected."
     );
 }
 
 
 // ======================================================
-// SETTINGS WINDOW
+// SETTINGS
 // ======================================================
 
 function openSettings() {
-
-  ui.settingsModal.classList.remove(
-    "hidden"
-  );
-
+  $("settingsModal").classList.remove("hidden");
 }
 
 
 function closeSettings() {
-
-  ui.settingsModal.classList.add(
-    "hidden"
-  );
-
+  $("settingsModal").classList.add("hidden");
 }
 
 
 // ======================================================
-// BLE CONNECTION
+// BLE CONNECT
 // ======================================================
 
 async function connectBLE() {
 
-  if (!("bluetooth" in navigator)) {
+  if (!navigator.bluetooth) {
 
-    ui.settingsMessage.textContent =
-      "Web Bluetooth is not available in this browser. Try Chrome or Edge on HTTPS or localhost.";
+    $("settingsMessage").textContent =
+      "Web Bluetooth is not supported by this browser.";
 
     return;
   }
@@ -252,11 +140,11 @@ async function connectBLE() {
 
   try {
 
-    ui.settingsMessage.textContent =
-      "Choose the VAJRA 2 Main ESP32-C3 device in the browser picker…";
+    $("settingsMessage").textContent =
+      "Searching for VAJRA 2 Main ESP32-C3...";
 
 
-    // Open Bluetooth device picker
+    // Ask browser for ESP32
 
     bleDevice =
       await navigator.bluetooth.requestDevice({
@@ -280,16 +168,16 @@ async function connectBLE() {
     );
 
 
-    // Connect to ESP32 BLE GATT server
+    // Connect
 
-    server =
+    bleServer =
       await bleDevice.gatt.connect();
 
 
-    // Get BLE service
+    // Get service
 
     const service =
-      await server.getPrimaryService(
+      await bleServer.getPrimaryService(
         SERVICE_UUID
       );
 
@@ -304,60 +192,70 @@ async function connectBLE() {
 
     // Telemetry characteristic
 
-    telemetryCharacteristic =
-      await service.getCharacteristic(
-        TELEMETRY_UUID
+    try {
+
+      telemetryCharacteristic =
+        await service.getCharacteristic(
+          TELEMETRY_UUID
+        );
+
+      if (
+        telemetryCharacteristic.properties.notify
+      ) {
+
+        telemetryCharacteristic.addEventListener(
+          "characteristicvaluechanged",
+          onTelemetry
+        );
+
+        await telemetryCharacteristic.startNotifications();
+
+      }
+
+    }
+
+    catch (telemetryError) {
+
+      console.log(
+        "Telemetry characteristic unavailable:",
+        telemetryError
       );
-
-
-    // Start telemetry notifications
-
-    if (
-      telemetryCharacteristic.properties.notify
-    ) {
-
-      telemetryCharacteristic.addEventListener(
-        "characteristicvaluechanged",
-        onTelemetry
-      );
-
-
-      await telemetryCharacteristic.startNotifications();
 
     }
 
 
     setConnection(
       true,
-      "Connected to Main ESP32-C3. Keep propellers removed during testing."
+      "Connected to Main ESP32-C3."
     );
 
 
-    ui.settingsMessage.textContent =
-      "Connected. Confirm the flight board firmware safely supports the JOY command before attempting any motor control.";
-
+    $("settingsMessage").textContent =
+      "VAJRA 2 connected successfully.";
 
     closeSettings();
 
 
-    startSending();
+    startCommandLoop();
 
   }
 
-  catch (err) {
+  catch (error) {
 
-    console.error(err);
+    console.error(
+      "BLE ERROR:",
+      error
+    );
 
 
-    ui.settingsMessage.textContent =
-      `Connection failed: ${
-        err.message || err
-      }. Check board power, BLE name, UUIDs, and browser permissions.`;
+    $("settingsMessage").textContent =
+      "Connection failed: " +
+      error.message;
 
 
     setConnection(
       false,
-      "BLE connection failed. Check Settings for details."
+      "BLE connection failed."
     );
 
   }
@@ -366,33 +264,29 @@ async function connectBLE() {
 
 
 // ======================================================
-// BLE DISCONNECTED
+// BLE DISCONNECT
 // ======================================================
 
 function onDisconnected() {
 
-  stopSending();
+  stopCommandLoop();
 
   commandCharacteristic = null;
 
   telemetryCharacteristic = null;
 
-  server = null;
+  bleServer = null;
 
   bleDevice = null;
 
 
-  centerSticks(false);
+  centerJoysticks(false);
 
 
   setConnection(
     false,
-    "BLE disconnected. Joystick commands stopped."
+    "BLE disconnected."
   );
-
-
-  ui.settingsMessage.textContent =
-    "Disconnected. Reconnect from Settings when ready.";
 
 }
 
@@ -401,33 +295,26 @@ function onDisconnected() {
 // MANUAL DISCONNECT
 // ======================================================
 
-async function disconnectBLE() {
+function disconnectBLE() {
 
-  stopSending();
+  stopCommandLoop();
 
 
-  try {
+  if (
+    bleDevice &&
+    bleDevice.gatt &&
+    bleDevice.gatt.connected
+  ) {
 
-    if (
-      bleDevice &&
-      bleDevice.gatt &&
-      bleDevice.gatt.connected
-    ) {
-
-      bleDevice.gatt.disconnect();
-
-    }
+    bleDevice.gatt.disconnect();
 
   }
 
-  catch (err) {
+  else {
 
-    console.warn(err);
+    onDisconnected();
 
   }
-
-
-  onDisconnected();
 
 }
 
@@ -450,45 +337,44 @@ function onTelemetry(event) {
     );
 
 
-  const telemetryText =
+  const text =
     new TextDecoder()
       .decode(bytes)
       .trim();
 
 
+  if (!text) {
+    return;
+  }
+
+
   $("lastMessage").textContent =
-    telemetryText ||
-    "Empty telemetry message";
+    text;
 
 
   /*
-    Expected examples:
+    Example:
 
-    ROLL:1.2,
-    PITCH:-0.5,
-    YAW:0,
-    BATTERY:11.4
+    ROLL:1.25,PITCH:-2.10,YAW:0,BATTERY:11.8
   */
 
 
-  const fields = {};
+  const values = {};
 
 
-  telemetryText
-    .split(/[;,\n]/)
-    .forEach(part => {
+  text
+    .split(/[,\n;]/)
+    .forEach(item => {
 
       const match =
-        part
-          .trim()
-          .match(
-            /^([A-Z_]+)\s*:\s*(-?\d+(?:\.\d+)?)/i
-          );
+        item.trim().match(
+          /^([A-Za-z_]+)\s*:\s*(-?\d+(?:\.\d+)?)/
+        );
 
 
       if (match) {
 
-        fields[
+        values[
           match[1].toUpperCase()
         ] =
           Number(match[2]);
@@ -498,60 +384,52 @@ function onTelemetry(event) {
     });
 
 
-  // Roll
-
   if (
-    Number.isFinite(fields.ROLL)
+    Number.isFinite(values.ROLL)
   ) {
 
     $("rollData").textContent =
-      fields.ROLL.toFixed(1) + "°";
+      values.ROLL.toFixed(1) + "°";
 
   }
 
 
-  // Pitch
-
   if (
-    Number.isFinite(fields.PITCH)
+    Number.isFinite(values.PITCH)
   ) {
 
     $("pitchData").textContent =
-      fields.PITCH.toFixed(1) + "°";
+      values.PITCH.toFixed(1) + "°";
 
   }
 
 
-  // Yaw
-
   if (
-    Number.isFinite(fields.YAW)
+    Number.isFinite(values.YAW)
   ) {
 
     $("yawData").textContent =
-      fields.YAW.toFixed(0);
+      values.YAW.toFixed(0);
 
   }
 
 
-  // Battery
-
   if (
-    Number.isFinite(fields.BATTERY)
+    Number.isFinite(values.BATTERY)
   ) {
 
     $("batteryData").textContent =
-      fields.BATTERY.toFixed(2) + " V";
+      values.BATTERY.toFixed(2) + " V";
 
   }
 
 
-  ui.dataMode.textContent =
+  $("dataMode").textContent =
     "LIVE DATA";
 
-
-  ui.dashboardMode.textContent =
-    "Connected / live telemetry";
+  $("dataMode").classList.add(
+    "live"
+  );
 
 }
 
@@ -568,142 +446,180 @@ function clamp(
 
   return Math.max(
     min,
-    Math.min(max, value)
+    Math.min(
+      max,
+      value
+    )
   );
 
 }
 
 
 // ======================================================
-// CALCULATE JOYSTICK POSITION
+// FIXED JOYSTICK SYSTEM
 // ======================================================
 
-function stickValues(
-  element,
-  event
+function setupJoystick(
+  knobId,
+  side
 ) {
 
-  const rect =
-    element.getBoundingClientRect();
+  // The HTML ID is on the knob.
+  // The joystick ring is its parent.
+
+  const knob =
+    $(knobId);
 
 
-  const radius =
-    Math.min(
-      rect.width,
-      rect.height
-    ) * 0.34;
+  if (!knob) {
 
+    console.error(
+      "Joystick knob not found:",
+      knobId
+    );
 
-  const centerX =
-    rect.left +
-    rect.width / 2;
-
-
-  const centerY =
-    rect.top +
-    rect.height / 2;
-
-
-  let dx =
-    event.clientX -
-    centerX;
-
-
-  let dy =
-    event.clientY -
-    centerY;
-
-
-  const length =
-    Math.hypot(dx, dy);
-
-
-  if (length > radius) {
-
-    dx =
-      dx / length *
-      radius;
-
-
-    dy =
-      dy / length *
-      radius;
+    return;
 
   }
 
 
-  return {
-
-    x: dx / radius,
-
-    y: -dy / radius,
-
-    px: dx,
-
-    py: dy
-
-  };
-
-}
-
-
-// ======================================================
-// SETUP JOYSTICK
-// ======================================================
-
-function setupStick(
-  id,
-  side
-) {
-
   const ring =
-    $(id);
+    knob.parentElement;
 
 
-  const knob =
-    ring.querySelector(".stick");
+  if (!ring) {
+
+    console.error(
+      "Joystick ring not found:",
+      knobId
+    );
+
+    return;
+
+  }
 
 
-  function move(event) {
+  let pointerActive =
+    false;
 
-    const v =
-      stickValues(
-        ring,
-        event
+
+  // --------------------------------------------
+  // MOVE JOYSTICK
+  // --------------------------------------------
+
+  function moveJoystick(event) {
+
+    const rect =
+      ring.getBoundingClientRect();
+
+
+    const centerX =
+      rect.left +
+      rect.width / 2;
+
+
+    const centerY =
+      rect.top +
+      rect.height / 2;
+
+
+    // Maximum movement of knob
+
+    const maxRadius =
+      Math.min(
+        rect.width,
+        rect.height
+      ) * 0.34;
+
+
+    let dx =
+      event.clientX -
+      centerX;
+
+
+    let dy =
+      event.clientY -
+      centerY;
+
+
+    const distance =
+      Math.sqrt(
+        dx * dx +
+        dy * dy
       );
 
 
+    // Keep knob inside circle
+
+    if (
+      distance > maxRadius
+    ) {
+
+      dx =
+        (dx / distance) *
+        maxRadius;
+
+
+      dy =
+        (dy / distance) *
+        maxRadius;
+
+    }
+
+
+    // Move visual knob
+
     knob.style.left =
-      `calc(50% + ${v.px}px)`;
+      `calc(50% + ${dx}px)`;
 
 
     knob.style.top =
-      `calc(50% + ${v.py}px)`;
+      `calc(50% + ${dy}px)`;
 
 
-    // ----------------------------------
+    // Normalized values
+
+    const x =
+      clamp(
+        dx / maxRadius,
+        -1,
+        1
+      );
+
+
+    const y =
+      clamp(
+        -dy / maxRadius,
+        -1,
+        1
+      );
+
+
+    // --------------------------------------------
     // LEFT JOYSTICK
-    // ----------------------------------
+    // --------------------------------------------
 
-    if (side === "left") {
+    if (
+      side === "left"
+    ) {
 
-      // Vertical = throttle
+      /*
+        UP    = throttle increase
+        DOWN  = throttle decrease
+
+        LEFT  = yaw left
+        RIGHT = yaw right
+      */
 
       axes.throttle =
         Math.round(
-          clamp(
-            (v.y + 1) * 50,
-            0,
-            100
-          )
+          ((y + 1) / 2) * 100
         );
 
 
-      // Horizontal = yaw
-
       axes.yaw =
         Math.round(
-          v.x * 100
+          x * 100
         );
 
 
@@ -714,54 +630,54 @@ function setupStick(
 
       $("yawValue")
         .textContent =
-        String(
-          axes.yaw
-        );
+        axes.yaw;
 
     }
 
 
-    // ----------------------------------
+    // --------------------------------------------
     // RIGHT JOYSTICK
-    // ----------------------------------
+    // --------------------------------------------
 
     else {
 
-      // Horizontal = roll
+      /*
+        UP    = pitch forward
+        DOWN  = pitch backward
+
+        LEFT  = roll left
+        RIGHT = roll right
+      */
 
       axes.roll =
         Math.round(
-          v.x * 100
+          x * 100
         );
 
 
-      // Vertical = pitch
-
       axes.pitch =
         Math.round(
-          v.y * 100
+          y * 100
         );
 
 
       $("rollValue")
         .textContent =
-        String(
-          axes.roll
-        );
+        axes.roll;
 
 
       $("pitchValue")
         .textContent =
-        String(
-          axes.pitch
-        );
+        axes.pitch;
 
     }
 
   }
 
 
-  // Pointer DOWN
+  // --------------------------------------------
+  // POINTER DOWN
+  // --------------------------------------------
 
   ring.addEventListener(
     "pointerdown",
@@ -770,164 +686,178 @@ function setupStick(
       event.preventDefault();
 
 
+      pointerActive = true;
+
+
       ring.setPointerCapture(
         event.pointerId
       );
 
 
-      activePointers.set(
-        event.pointerId,
-        side
-      );
-
-
-      move(event);
+      moveJoystick(event);
 
     }
   );
 
 
-  // Pointer MOVE
+  // --------------------------------------------
+  // POINTER MOVE
+  // --------------------------------------------
 
   ring.addEventListener(
     "pointermove",
     event => {
 
-      if (
-        activePointers.has(
-          event.pointerId
-        )
-      ) {
-
-        move(event);
-
+      if (!pointerActive) {
+        return;
       }
+
+
+      event.preventDefault();
+
+
+      moveJoystick(event);
 
     }
   );
 
 
-  // Pointer RELEASE
+  // --------------------------------------------
+  // RELEASE
+  // --------------------------------------------
 
-  const release =
-    event => {
+  function releaseJoystick(event) {
 
-      if (
-        !activePointers.has(
-          event.pointerId
-        )
-      ) {
-
-        return;
-
-      }
+    if (!pointerActive) {
+      return;
+    }
 
 
-      activePointers.delete(
+    pointerActive = false;
+
+
+    try {
+
+      ring.releasePointerCapture(
         event.pointerId
       );
 
+    }
 
-      knob.style.left =
-        "50%";
+    catch (error) {
 
+      // Pointer may already have been released.
 
-      knob.style.top =
-        "50%";
-
-
-      if (side === "left") {
-
-        axes.throttle = 0;
-
-        axes.yaw = 0;
+    }
 
 
-        $("throttleValue")
-          .textContent =
-          "0%";
-
-
-        $("yawValue")
-          .textContent =
-          "0";
-
-      }
-
-      else {
-
-        axes.roll = 0;
-
-        axes.pitch = 0;
-
-
-        $("rollValue")
-          .textContent =
-          "0";
-
-
-        $("pitchValue")
-          .textContent =
-          "0";
-
-      }
-
-    };
-
-
-  ring.addEventListener(
-    "pointerup",
-    release
-  );
-
-
-  ring.addEventListener(
-    "pointercancel",
-    release
-  );
-
-
-  ring.addEventListener(
-    "lostpointercapture",
-    release
-  );
-
-}
-
-
-// ======================================================
-// CENTER BOTH JOYSTICKS
-// ======================================================
-
-function centerSticks(
-  sendNow = true
-) {
-
-  activePointers.clear();
-
-
-  for (
-    const id of [
-      "leftStick",
-      "rightStick"
-    ]
-  ) {
-
-    const ring =
-      $(id);
-
-
-    const knob =
-      ring.querySelector(
-        ".stick"
-      );
-
+    // Return knob to center
 
     knob.style.left =
       "50%";
 
 
     knob.style.top =
+      "50%";
+
+
+    // Reset values
+
+    if (
+      side === "left"
+    ) {
+
+      axes.throttle = 0;
+
+      axes.yaw = 0;
+
+
+      $("throttleValue")
+        .textContent =
+        "0%";
+
+
+      $("yawValue")
+        .textContent =
+        "0";
+
+    }
+
+    else {
+
+      axes.roll = 0;
+
+      axes.pitch = 0;
+
+
+      $("rollValue")
+        .textContent =
+        "0";
+
+
+      $("pitchValue")
+        .textContent =
+        "0";
+
+    }
+
+
+    // Send neutral command
+
+    sendCommand(
+      commandString()
+    );
+
+  }
+
+
+  ring.addEventListener(
+    "pointerup",
+    releaseJoystick
+  );
+
+
+  ring.addEventListener(
+    "pointercancel",
+    releaseJoystick
+  );
+
+}
+
+
+// ======================================================
+// CENTER JOYSTICKS
+// ======================================================
+
+function centerJoysticks(
+  send = true
+) {
+
+  const left =
+    $("leftStick");
+
+
+  const right =
+    $("rightStick");
+
+
+  if (left) {
+
+    left.style.left =
+      "50%";
+
+    left.style.top =
+      "50%";
+
+  }
+
+
+  if (right) {
+
+    right.style.left =
+      "50%";
+
+    right.style.top =
       "50%";
 
   }
@@ -962,10 +892,7 @@ function centerSticks(
     "0";
 
 
-  if (
-    sendNow &&
-    commandCharacteristic
-  ) {
+  if (send) {
 
     sendCommand(
       "JOY,0,0,0,0"
@@ -977,27 +904,21 @@ function centerSticks(
 
 
 // ======================================================
-// CREATE JOYSTICK COMMAND
+// COMMAND FORMAT
 // ======================================================
 
 function commandString() {
 
-  /*
-    Protocol:
-
-    JOY,
-    throttle 0..100,
-    yaw -100..100,
-    roll -100..100,
-    pitch -100..100
-
-    Example:
-
-    JOY,50,0,0,0
-  */
-
-
-  return `JOY,${axes.throttle},${axes.yaw},${axes.roll},${axes.pitch}`;
+  return (
+    "JOY," +
+    axes.throttle +
+    "," +
+    axes.yaw +
+    "," +
+    axes.roll +
+    "," +
+    axes.pitch
+  );
 
 }
 
@@ -1019,21 +940,24 @@ function sendCommand(
   }
 
 
-  const text =
-    command + "\n";
+  const data =
+    new TextEncoder().encode(
+      command + "\n"
+    );
 
 
   /*
-    Queue BLE writes.
-
-    This prevents multiple GATT
-    writes from happening at exactly
-    the same time when the joystick
-    moves quickly.
+    Queue writes so rapid joystick
+    movement does not overload BLE.
   */
 
-  writeQueue =
-    writeQueue
+  window.vajraWriteQueue =
+    window.vajraWriteQueue ||
+    Promise.resolve();
+
+
+  window.vajraWriteQueue =
+    window.vajraWriteQueue
       .then(async () => {
 
         if (
@@ -1045,14 +969,8 @@ function sendCommand(
         }
 
 
-        const data =
-          new TextEncoder()
-            .encode(text);
-
-
         if (
-          commandCharacteristic
-            .properties
+          commandCharacteristic.properties
             .writeWithoutResponse &&
           commandCharacteristic
             .writeValueWithoutResponse
@@ -1075,17 +993,12 @@ function sendCommand(
         }
 
       })
-
-      .catch(err => {
+      .catch(error => {
 
         console.error(
-          "BLE command write failed:",
-          err
+          "BLE write error:",
+          error
         );
-
-
-        ui.commandStatus.textContent =
-          "Command write failed. Disconnect and check the Main board.";
 
       });
 
@@ -1093,62 +1006,57 @@ function sendCommand(
 
 
 // ======================================================
-// START COMMAND TRANSMISSION
+// COMMAND LOOP
 // ======================================================
 
-function startSending() {
+function startCommandLoop() {
 
-  stopSending();
-
-
-  lastSent = "";
+  stopCommandLoop();
 
 
   sendTimer =
-    setInterval(() => {
+    setInterval(
+      () => {
 
-      if (
-        !commandCharacteristic
-      ) {
+        if (
+          !commandCharacteristic
+        ) {
 
-        return;
+          return;
 
-      }
-
-
-      const command =
-        commandString();
+        }
 
 
-      /*
-        Only send when the command
-        changes.
-      */
-
-      if (
-        command !== lastSent
-      ) {
-
-        sendCommand(
-          command
-        );
+        const command =
+          commandString();
 
 
-        lastSent =
-          command;
+        if (
+          command !== lastCommand
+        ) {
 
-      }
+          sendCommand(
+            command
+          );
 
-    }, 100);
+
+          lastCommand =
+            command;
+
+        }
+
+      },
+      50
+    );
 
 }
 
 
 // ======================================================
-// STOP COMMAND TRANSMISSION
+// STOP COMMAND LOOP
 // ======================================================
 
-function stopSending() {
+function stopCommandLoop() {
 
   if (sendTimer) {
 
@@ -1161,7 +1069,7 @@ function stopSending() {
 
   sendTimer = null;
 
-  lastSent = "";
+  lastCommand = "";
 
 }
 
@@ -1170,9 +1078,9 @@ function stopSending() {
 // EMERGENCY STOP
 // ======================================================
 
-async function emergencyStop() {
+function emergencyStop() {
 
-  centerSticks(false);
+  centerJoysticks(false);
 
 
   if (
@@ -1186,14 +1094,14 @@ async function emergencyStop() {
   }
 
 
-  ui.commandStatus.textContent =
-    "STOP command sent to Main ESP32-C3. This is not a substitute for a hardware failsafe.";
+  $("commandStatus").textContent =
+    "STOP command sent to Main ESP32-C3.";
 
 }
 
 
 // ======================================================
-// BUTTON EVENTS
+// BUTTONS
 // ======================================================
 
 $("openSettings")
@@ -1203,7 +1111,7 @@ $("openSettings")
   );
 
 
-ui.settingsConnect
+$("settingsConnect")
   .addEventListener(
     "click",
     openSettings
@@ -1217,32 +1125,28 @@ $("closeSettings")
   );
 
 
-ui.modalConnect
+$("modalConnect")
   .addEventListener(
     "click",
     connectBLE
   );
 
 
-ui.connectQuick
+$("connectQuick")
   .addEventListener(
     "click",
-    () => {
-
-      openSettings();
-
-    }
+    openSettings
   );
 
 
-ui.disconnectButton
+$("disconnectButton")
   .addEventListener(
     "click",
     disconnectBLE
   );
 
 
-ui.stopButton
+$("stopButton")
   .addEventListener(
     "click",
     emergencyStop
@@ -1253,25 +1157,23 @@ $("centerButton")
   .addEventListener(
     "click",
     () => {
-
-      centerSticks(true);
-
+      centerJoysticks(true);
     }
   );
 
 
 // ======================================================
-// CLOSE SETTINGS WHEN CLICKING OUTSIDE
+// CLOSE MODAL WHEN CLICKING OUTSIDE
 // ======================================================
 
-ui.settingsModal
+$("settingsModal")
   .addEventListener(
     "click",
     event => {
 
       if (
         event.target ===
-        ui.settingsModal
+        $("settingsModal")
       ) {
 
         closeSettings();
@@ -1283,23 +1185,29 @@ ui.settingsModal
 
 
 // ======================================================
-// INITIALIZE JOYSTICKS
+// START JOYSTICKS
 // ======================================================
 
-setupStick(
+setupJoystick(
   "leftStick",
   "left"
 );
 
 
-setupStick(
+setupJoystick(
   "rightStick",
   "right"
 );
 
 
 // ======================================================
-// INITIAL STATE
+// INITIALIZE
 // ======================================================
 
+centerJoysticks(false);
+
 setConnection(false);
+
+console.log(
+  "VAJRA 2 dual joystick controller ready."
+);
